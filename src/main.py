@@ -6,7 +6,7 @@ import requests_cache
 
 from pprint import pprint
 
-from history import Record, print_last_n
+from history import Record, print_last, print_oldest
 from helpers import sanitize_word, format_def
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
@@ -65,10 +65,19 @@ def define(word, output_language, no_cache, clear_cache):
 
 
 @defword.command("history")
-@click.option('-n', 'n', type=int, help='This option prints out the last 5 (default) or n definition lookups.')
-def history(n):
-    if n:
-        print_last_n(n)
+@click.option('--last', '-l', 'l', type=int, help='This option prints out the latest or n definition lookups.')
+@click.option('--oldest', '-o', 'o', type=int, help='This option prints out the oldest 5 (default) or n definition lookups.')
+def history(l, o):
+    if l:
+        print_last(l)
+
+    if o:
+        print_oldest(o)
+
+    ## if neither options were provided -> print out the last 5 lookups
+    if not l and not o:
+        print_last(5)
+
 
 # fetches the english definition of an english word
 def fetch_definition(word):

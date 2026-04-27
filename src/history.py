@@ -2,6 +2,7 @@ import json
 import uuid
 
 from datetime import datetime
+from itertools import islice
 
 # {
 #     id: 
@@ -14,6 +15,9 @@ from datetime import datetime
 #     ]
 #     date: now()
 # }
+
+# The history.json file will be created in the project's root folder
+HISTORY_PATH = "./history.json"
 
 class Record:
     def __init__(self, word, definitions):
@@ -34,11 +38,11 @@ class Record:
         return json.dumps(self.__dict__)
 
     def write_to_history(self):
-        with open("history.json", "a") as history:
+        with open(HISTORY_PATH, "a") as history:
             history.write(self.to_json() + "\n")
 
-def print_last_n(n):
-    with open("history.json") as file_history:
+def print_last(n):
+    with open(HISTORY_PATH) as file_history:
         lines = file_history.readlines()
 
         for line in lines[-n:]:
@@ -47,5 +51,18 @@ def print_last_n(n):
             w = line["word"]
             print(f"[{d}] {w}:")
             for defs in line["definitions"]:
-                print(f"[{defs["language"]}] {defs["definition"]}")
+                print(f'[{defs["language"]}] {defs["definition"]}')
+            print()
+
+def print_oldest(n):
+    with open(HISTORY_PATH) as file_history:
+        for line in islice(file_history, n):
+            line = json.loads(line)
+            d = line["date"]
+            w = line["word"]
+            print(f"[{d}] {w}:")
+            for defs in line["definitions"]:
+                print(f'[{defs["language"]}] {defs["definition"]}')
+            print()
+
 
