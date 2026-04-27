@@ -4,10 +4,16 @@ import click
 import requests
 import requests_cache
 
-from history import Word
+from pprint import pprint
+
+from history import Record
+from helpers import sanitize_word, format_def
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
 translationAPI = "https://api.mymemory.translated.net/get"
+
+# This "constant" represents the default language code
+EN_CODE = "en"
 
 requests_cache.install_cache('requests_cache', expire_after=86400)
 
@@ -26,23 +32,34 @@ def defword(word, output_language, no_cache, clear_cache):
     word_s = sanitize_word(word)
 
     definitions = []
+
     if no_cache:
         with requests_cache.disabled():
-            definitions.append(fetch_definition(word_s))
+            definitions.append(format_def(EN_CODE, fetch_definition(word_s)))
     else:
-        definitions.append(fetch_definition(word_s))
+        definitions.append(format_def(EN_CODE, fetch_definition(word_s)))
+
+    record = Record(word_s, definitions)
+    pprint(record.to_json())
 
     if output_language:
         for l in output_language:
-            translated = fetch_translation(definitions[0], "en", l)
-            definitions.append(translated)
+            translated = fetch_translation(definitions[0]["definition"], EN_CODE, l)
+            # print(translated)
+            definitions.append(format_def(l, translated))
 
-    for d in definitions:
-        print(d)
+    record
+    if output_language: 
+        for d in definitions[1:]:
+            print(d["definition"])
+        record = Record(word_s, definitions[1:])
+    else:
+        for d in definitions:
+            print(d["definition"])
+        record = Record(word_s, definitions)
+ 
+    record.write_to_history()
 
-# sanitezes the word by making it lowercase and trimming white spaces
-def sanitize_word(word):
-    return word.lower().strip()
 
 # fetches the english definition of an english word
 def fetch_definition(word):
@@ -50,10 +67,10 @@ def fetch_definition(word):
     data = response.json()
 
     first_definition = data['entries'][0]['senses'][0]['definition']
-    language_name = data['entries'][0]['language']['name']
+    # language_name = data['entries'][0]['language']['name']
     part_speech = data['entries'][0]['partOfSpeech']
 
-    definition = f"{word.capitalize()} ({language_name} {part_speech}) - {first_definition}"
+    definition = f"{word.capitalize()} ({part_speech}) - {first_definition}"
     return definition
 
 
