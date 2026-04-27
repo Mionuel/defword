@@ -6,7 +6,7 @@ import requests_cache
 
 from pprint import pprint
 
-from history import Record
+from history import Record, print_last_n
 from helpers import sanitize_word, format_def
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
@@ -17,15 +17,18 @@ EN_CODE = "en"
 
 requests_cache.install_cache('requests_cache', expire_after=86400)
 
-@click.command()
+@click.group()
+def defword():
+    pass
+
+@defword.command("define")
 @click.argument('word')
 @click.option('-o', '--output', 'output_language', multiple=True, 
               help='The target (output) language(s). This flag can be used multiple times in order to define the word in multiple languages.')
 @click.option('--no-cache', 'no_cache', is_flag=True, help='Disables the requests caching for this call.')
 @click.option('--clear-cache', 'clear_cache', is_flag=True, help='Resets the cache file.')
-# @click.option('-h', '--history', 'history', type=int, help='This flag prints out the last 5 (default) or n definition lookups.')
 # @click.option('-i', '--input', 'input_language', help='The input language.')
-def defword(word, output_language, no_cache, clear_cache):
+def define(word, output_language, no_cache, clear_cache):
     if clear_cache:
         requests_cache.uninstall_cache()
 
@@ -40,7 +43,7 @@ def defword(word, output_language, no_cache, clear_cache):
         definitions.append(format_def(EN_CODE, fetch_definition(word_s)))
 
     record = Record(word_s, definitions)
-    pprint(record.to_json())
+    # pprint(record.to_json())
 
     if output_language:
         for l in output_language:
@@ -60,6 +63,12 @@ def defword(word, output_language, no_cache, clear_cache):
  
     record.write_to_history()
 
+
+@defword.command("history")
+@click.option('-n', 'n', type=int, help='This option prints out the last 5 (default) or n definition lookups.')
+def history(n):
+    if n:
+        print_last_n(n)
 
 # fetches the english definition of an english word
 def fetch_definition(word):

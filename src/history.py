@@ -31,9 +31,21 @@ class Record:
             print(l)
 
     def to_json(self):
-        return json.dumps(self.__dict__, indent=4)
+        return json.dumps(self.__dict__)
 
     def write_to_history(self):
         with open("history.json", "a") as history:
             history.write(self.to_json() + "\n")
+
+def print_last_n(n):
+    with open("history.json") as file_history:
+        lines = file_history.readlines()
+
+        for line in lines[-n:]:
+            line = json.loads(line)
+            d = line["date"]
+            w = line["word"]
+            print(f"[{d}] {w}:")
+            for defs in line["definitions"]:
+                print(f"[{defs["language"]}] {defs["definition"]}")
 
