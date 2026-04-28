@@ -47,23 +47,19 @@ def print_last(n):
         last_lines = deque(file_history, maxlen=n)
 
         for line in last_lines:
-            line = json.loads(line)
-            d = line["date"]
-            w = line["word"]
-            print(f"[{d}] {w}:")
-            for defs in line["definitions"]:
-                print(f'[{defs["language"]}] {defs["definition"]}')
-            print()
+            format_print_line(line)
 
 def print_oldest(n):
     with open(HISTORY_PATH) as file_history:
         for line in islice(file_history, n):
-            line = json.loads(line)
-            d = line["date"]
-            w = line["word"]
-            print(f"[{d}] {w}:")
-            for defs in line["definitions"]:
-                print(f'[{defs["language"]}] {defs["definition"]}')
-            print()
+            format_print_line(line)
 
+def format_print_line(line):
+        line = json.loads(line)
+        d = line["date"]
+        w = line["word"]
+        print(f"[{d}] {w}:")
+        for defs in line["definitions"]:
+            print(f'[{defs["language"]}] {defs["definition"]}')
+        print()
 
