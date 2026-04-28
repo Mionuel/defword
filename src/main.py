@@ -1,4 +1,5 @@
 import json
+import sys
 
 import click
 import requests
@@ -98,12 +99,21 @@ def history(l, o, d, clear):
 
 # fetches the english definition of an english word
 def fetch_definition(word):
-    response = requests.get(f"{dictionaryAPI}/en/{word}")
-    data = response.json()
+    try:
+        response = requests.get(f"{dictionaryAPI}/en/{word}")
+        data = response.json()
+    except requests.exceptions.RequestException:
+        print(f"Network error")
+        sys.exit(1)
 
-    first_definition = data['entries'][0]['senses'][0]['definition']
-    # language_name = data['entries'][0]['language']['name']
-    part_speech = data['entries'][0]['partOfSpeech']
+    try:
+        first_definition = data['entries'][0]['senses'][0]['definition']
+        # language_name = data['entries'][0]['language']['name']
+        part_speech = data['entries'][0]['partOfSpeech']
+
+    except (KeyError, IndexError):
+        print(f"No definition found for {word}")
+        sys.exit(1)
 
     definition = f"{word.capitalize()} ({part_speech}) - {first_definition}"
     return definition
@@ -116,9 +126,13 @@ def fetch_translation(text, in_language, out_language):
         "langpair": f"{in_language}|{out_language}"
     }
 
-    response = requests.get(translationAPI, params=my_params) 
+    try:
+        response = requests.get(translationAPI, params=my_params) 
+        data = response.json()
+    except requests.exceptions.RequestException:
+        print(f"Network error")
+        sys.exit(1)
 
-    data = response.json()   
     return data["responseData"]["translatedText"]
   
 if __name__ == '__main__':
