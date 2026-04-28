@@ -63,3 +63,6 @@ def format_print_line(line):
             print(f'[{defs["language"]}] {defs["definition"]}')
         print()
 
+def clear_history():
+    with open(HISTORY_PATH, 'w') as file_history:    
+        pass

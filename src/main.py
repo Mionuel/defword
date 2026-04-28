@@ -6,7 +6,7 @@ import requests_cache
 
 from pprint import pprint
 
-from history import Record, print_last, print_oldest
+from history import Record, print_last, print_oldest, clear_history
 from helpers import sanitize_word, format_def
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
@@ -65,14 +65,23 @@ def define(word, output_language, no_cache, clear_cache):
 
 
 @defword.command("history")
-@click.option('--last', '-l', 'l', type=int, help='This option prints out the latest or n definition lookups.')
-@click.option('--oldest', '-o', 'o', type=int, help='This option prints out the oldest 5 (default) or n definition lookups.')
-def history(l, o):
+@click.option('--last', '-l', 'l', type=int, help='Prints out the latest n definition lookups.')
+@click.option('--oldest', '-o', 'o', type=int, help='Prints out the oldest n definition lookups.')
+@click.option('--clear', 'clear', is_flag=True, help='Clears the history file after confirming the action.')
+def history(l, o, clear):
     if l:
         print_last(l)
 
     if o:
         print_oldest(o)
+
+    if clear:
+        print("Are you sure you want to clear the history? [y/n]")
+        response = input().lower()
+        if response == "y":
+            clear_history()
+        else:
+            return
 
     ## if neither options were provided -> print out the last 5 lookups
     if not l and not o:
