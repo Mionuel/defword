@@ -2,6 +2,7 @@ import json
 import uuid
 
 from datetime import datetime
+from collections import deque
 from itertools import islice
 
 # {
@@ -17,7 +18,7 @@ from itertools import islice
 # }
 
 # The history.json file will be created in the project's root folder
-HISTORY_PATH = "./history.json"
+HISTORY_PATH = "./history.jsonl"
 
 class Record:
     def __init__(self, word, definitions):
@@ -43,9 +44,9 @@ class Record:
 
 def print_last(n):
     with open(HISTORY_PATH) as file_history:
-        lines = file_history.readlines()
+        last_lines = deque(file_history, maxlen=n)
 
-        for line in lines[-n:]:
+        for line in last_lines:
             line = json.loads(line)
             d = line["date"]
             w = line["word"]
