@@ -1,4 +1,4 @@
 .venv
 __pycache__
 history.jsonl
-requests_cache.sqlite
+*.sqlite

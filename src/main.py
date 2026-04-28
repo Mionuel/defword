@@ -6,7 +6,7 @@ import requests_cache
 
 from pprint import pprint
 
-from history import Record, print_last, print_oldest, clear_history
+from history import Record, print_last, print_oldest, clear_history, print_duplicate_lookups
 from helpers import sanitize_word, format_def
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
@@ -67,13 +67,16 @@ def define(word, output_language, no_cache, clear_cache):
 @defword.command("history")
 @click.option('--last', '-l', 'l', type=int, help='Prints out the latest n definition lookups.')
 @click.option('--oldest', '-o', 'o', type=int, help='Prints out the oldest n definition lookups.')
+@click.option('--duplicates', '-d', 'd', is_flag=True, help='Prints out the words that were looked up more than once.')
 @click.option('--clear', 'clear', is_flag=True, help='Clears the history file after confirming the action.')
-def history(l, o, clear):
+def history(l, o, d, clear):
     if l:
         print_last(l)
+        return
 
     if o:
         print_oldest(o)
+        return
 
     if clear:
         print("Are you sure you want to clear the history? [y/n]")
@@ -82,10 +85,15 @@ def history(l, o, clear):
             clear_history()
         else:
             return
+        
+    if d:
+        print_duplicate_lookups()
+        return
 
-    ## if neither options were provided -> print out the last 5 lookups
+    ## if no options were provided -> print out the last 5 lookups
     if not l and not o:
         print_last(5)
+        return
 
 
 # fetches the english definition of an english word

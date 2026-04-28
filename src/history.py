@@ -2,7 +2,7 @@ import json
 import uuid
 
 from datetime import datetime
-from collections import deque
+from collections import Counter, deque
 from itertools import islice
 
 # {
@@ -62,6 +62,23 @@ def format_print_line(line):
         for defs in line["definitions"]:
             print(f'[{defs["language"]}] {defs["definition"]}')
         print()
+
+def print_duplicate_lookups():
+    words = []
+    with open(HISTORY_PATH, 'r') as history_file:
+        for line in history_file:
+            line = json.loads(line)
+            words.append(line['word'])
+    
+    word_counts = Counter(words)
+    
+    if not any(count > 1 for count in word_counts.values()):
+        print("No words were looked up more than once.")
+        return
+    
+    for word, count in word_counts.most_common():
+        if count > 1:
+            print(f"{word} - {count} times")
 
 def clear_history():
     with open(HISTORY_PATH, 'w') as file_history:    
