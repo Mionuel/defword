@@ -56,6 +56,7 @@ def print_last(n):
             if not is_first_line:
                 print()
 
+            line = json.loads(line)
             format_print_line(line)
             is_first_line = False
 
@@ -67,7 +68,8 @@ def print_oldest(n):
         for line in islice(file_history, n):
             if not is_first_line:
                 print()
-
+                
+            line = json.loads(line)
             format_print_line(line)
             is_first_line = False
 

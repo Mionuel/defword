@@ -1,17 +1,10 @@
-import json
-import sys
-
 import click
-import requests
 import requests_cache
 
-from pprint import pprint
-
 from history import Record, print_last, print_oldest, clear_history, print_duplicate_lookups
-from helpers import sanitize_word, format_def
+from helpers import sanitize_word, format_def, fetch_definition, fetch_translation, format_translation
 
-dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
-translationAPI = "https://api.mymemory.translated.net/get"
+from epilogs import history_examples, define_examples, cache_examples
 
 # This "constant" represents the default language code
 EN_CODE = "en"
@@ -22,20 +15,21 @@ requests_cache.install_cache('requests_cache', expire_after=86400)
 def defword():
     pass
 
-@defword.command("define")
+@defword.command("define", epilog=define_examples)
 @click.argument('word')
 @click.option('-o', '--output', 'output_language', multiple=True, 
-              help='The target (output) language(s). This flag can be used multiple times in order to define the word in multiple languages.')
-@click.option('--no-cache', 'no_cache', is_flag=True, help='Disables the requests caching for this call.')
-@click.option('--clear-cache', 'clear_cache', is_flag=True, help='Resets the cache file.')
-# @click.option('-i', '--input', 'input_language', help='The input language.')
-def define(word, output_language, no_cache, clear_cache):
-    if clear_cache:
-        requests_cache.uninstall_cache()
-
+              help='Set the target (output) language. Can be used multiple times.')
+@click.option('--no-cache', 'no_cache', is_flag=True, help='Ignore cached requests for this call.')
+@click.option('-i', '--input', 'input_language', help='Set the input language. Can only be used once.')
+def define(word, output_language, no_cache, input_language):
+    """Defines the word"""
     word_s = sanitize_word(word)
 
     definitions = []
+
+    if input_language and input_language != EN_CODE:
+        english_translation = fetch_translation(word_s, input_language, EN_CODE)
+        word_s = format_translation(english_translation)
 
     if no_cache:
         with requests_cache.disabled():
@@ -44,12 +38,10 @@ def define(word, output_language, no_cache, clear_cache):
         definitions.append(format_def(EN_CODE, fetch_definition(word_s)))
 
     record = Record(word_s, definitions)
-    # pprint(record.to_json())
 
     if output_language:
         for l in output_language:
             translated = fetch_translation(definitions[0]["definition"], EN_CODE, l)
-            # print(translated)
             definitions.append(format_def(l, translated))
 
     record
@@ -65,12 +57,13 @@ def define(word, output_language, no_cache, clear_cache):
     record.write_to_history()
 
 
-@defword.command("history")
-@click.option('--last', '-l', 'l', type=int, help='Prints out the latest n definition lookups.')
-@click.option('--oldest', '-o', 'o', type=int, help='Prints out the oldest n definition lookups.')
-@click.option('--duplicates', '-d', 'd', is_flag=True, help='Prints out the words that were looked up more than once.')
-@click.option('--clear', 'clear', is_flag=True, help='Clears the history file after confirming the action.')
+@defword.command("history", epilog=history_examples)
+@click.option('--last', '-l', 'l', type=int, help='Print out the latest n definition lookups.')
+@click.option('--oldest', '-o', 'o', type=int, help='Print out the oldest n definition lookups.')
+@click.option('--duplicates', '-d', 'd', is_flag=True, help='Print out the words that were looked up more than once.')
+@click.option('--clear', 'clear', is_flag=True, help='Confirm and clear the history file.')
 def history(l, o, d, clear):
+    """Manages your definition lookups history."""
     if l:
         print_last(l)
         return
@@ -95,45 +88,15 @@ def history(l, o, d, clear):
     if not l and not o:
         print_last(5)
         return
+    
+@defword.command("cache", epilog=cache_examples)
+@click.option('--clear', '-c', 'clear', is_flag=True, help='Reset the cache file.')
+def cache(clear):
+    """Manages the request caching"""
+    if clear:
+        requests_cache.clear()
+        print("Cache cleared successfully!")
 
-
-# fetches the english definition of an english word
-def fetch_definition(word):
-    try:
-        response = requests.get(f"{dictionaryAPI}/en/{word}")
-        data = response.json()
-    except requests.exceptions.RequestException:
-        print(f"Network error")
-        sys.exit(1)
-
-    try:
-        first_definition = data['entries'][0]['senses'][0]['definition']
-        # language_name = data['entries'][0]['language']['name']
-        part_speech = data['entries'][0]['partOfSpeech']
-
-    except (KeyError, IndexError):
-        print(f"No definition found for {word}")
-        sys.exit(1)
-
-    definition = f"{word.capitalize()} ({part_speech}) - {first_definition}"
-    return definition
-
-
-# fetches the translation of a definition
-def fetch_translation(text, in_language, out_language):
-    my_params = {
-        "q": text,
-        "langpair": f"{in_language}|{out_language}"
-    }
-
-    try:
-        response = requests.get(translationAPI, params=my_params) 
-        data = response.json()
-    except requests.exceptions.RequestException:
-        print(f"Network error")
-        sys.exit(1)
-
-    return data["responseData"]["translatedText"]
   
 if __name__ == '__main__':
-    defword() 
+    defword(prog_name="defword") 
