@@ -1,0 +1,9 @@
+name: defwordenv
+channels:
+  - defaults
+dependencies:
+  - python=3.14.3
+  - click
+  - requests
+  - requests-cache
+prefix: /home/mionuel/miniconda3/envs/defwordenv
