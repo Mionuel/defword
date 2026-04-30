@@ -43,7 +43,9 @@ If no input or output options are provided, the tool defaults to English.
 ```bash
 defword define ambiguous
 ```
-> Ambiguous (adjective) - Open to multiple interpretations.
+```text
+Ambiguous (adjective) - Open to multiple interpretations.
+```
 
 **Translation**
 
@@ -51,7 +53,9 @@ Specify the input and output languages. In this example, the input is German (`d
 ```bash
 defword define langsam -i de -o it
 ```
-> Lento (aggettivo) - Impiega molto tempo per muoversi o percorrere una breve distanza, o per eseguire un'azione; non è veloce nel movimento; procede a bassa velocità.
+```text
+Lento (aggettivo) - Impiega molto tempo per muoversi o percorrere una breve distanza, o per eseguire un'azione; non è veloce nel movimento; procede a bassa velocità.
+```
 
 **Multiple Output Languages**
 
@@ -59,9 +63,11 @@ You can provide multiple output languages:
 ```bash
 defword define strasse -i de -o it -o pl -o es
 ```
-> Strada (sostantivo) - Una parte di strada asfaltata, di solito in un villaggio o in una città.
-> Ulica (rzeczownik) - utwardzona część drogi, zwykle we wsi lub mieście.
-> Calle (sustantivo) - Una parte pavimentada de la carretera, generalmente en un pueblo o una ciudad.
+```text
+Strada (sostantivo) - Una parte di strada asfaltata, di solito in un villaggio o in una città.
+Ulica (rzeczownik) - utwardzona część drogi, zwykle we wsi lub mieście.
+Calle (sustantivo) - Una parte pavimentada de la carretera, generalmente en un pueblo o una ciudad.
+```
 
 ### Viewing History
 
