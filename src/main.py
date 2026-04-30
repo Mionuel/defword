@@ -26,7 +26,7 @@ def define(word, output_language, no_cache, input_language):
     """Defines the word"""
     word_s = sanitize_word(word)
 
-    if word_s == "clair" or "obscur":
+    if word_s == "clair" or word_s == "obscur":
         print("Tomorrow comes!")
         return
 
