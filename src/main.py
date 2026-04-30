@@ -26,11 +26,16 @@ def define(word, output_language, no_cache, input_language):
     """Defines the word"""
     word_s = sanitize_word(word)
 
+    if word_s == "clair" or "obscur":
+        print("Tomorrow comes!")
+        return
+
     definitions = []
 
     if input_language and input_language != EN_CODE:
         english_translation = fetch_translation(word_s, input_language, EN_CODE)
         word_s = format_translation(english_translation)
+        # print(word_s)
 
     if no_cache:
         with requests_cache.disabled():

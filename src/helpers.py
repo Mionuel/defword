@@ -19,8 +19,11 @@ def sanitize_word(word):
 def format_def(lang, text):
     return {"language": lang, "definition": text}
 
+# formats the translated words
+# since mymemory is a human created dictionary some translation may containt punctuation marks
+# and even other words, hence the split(" ")
 def format_translation(text):
-    return text.lower().replace(".", "")
+    return text.split(" ")[0].lower().replace(".", "")
 
 # formats a given line and prints it out
 # expects a dict
