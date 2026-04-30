@@ -1,8 +1,15 @@
+from pathlib import Path
+
 import requests
 import sys
 
 dictionaryAPI = "https://freedictionaryapi.com/api/v1/entries"
 translationAPI = "https://api.mymemory.translated.net/get"
+
+DATA_DIR = Path.home() / ".local" / "share" / "defword"
+
+HISTORY_PATH = DATA_DIR / "history.jsonl"
+CACHE_PATH = DATA_DIR / "requests_cache"
 
 # sanitizes the word by making it lowercase and trimming white spaces
 def sanitize_word(word):

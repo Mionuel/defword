@@ -3,13 +3,14 @@ import requests_cache
 
 from history import Record, print_last, print_oldest, clear_history, print_duplicate_lookups
 from helpers import sanitize_word, format_def, fetch_definition, fetch_translation, format_translation
-
 from epilogs import history_examples, define_examples, cache_examples
+
+from helpers import CACHE_PATH
 
 # This "constant" represents the default language code
 EN_CODE = "en"
 
-requests_cache.install_cache('requests_cache', expire_after=86400)
+requests_cache.install_cache(str(CACHE_PATH), expire_after=86400)
 
 @click.group()
 def defword():

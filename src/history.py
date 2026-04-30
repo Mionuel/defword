@@ -5,8 +5,7 @@ from datetime import datetime
 from collections import Counter, deque
 from itertools import islice
 
-from helpers import format_print_line
-
+from helpers import format_print_line, HISTORY_PATH
 # {
 #     id: 
 #     word: fire,
@@ -18,9 +17,6 @@ from helpers import format_print_line
 #     ]
 #     date: now()
 # }
-
-# The history.json file will be created in the project's root folder
-HISTORY_PATH = "./history.jsonl"
 
 # A class for memorizing a word and its definitions inside an object
 class Record:
