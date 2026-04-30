@@ -38,6 +38,7 @@ It runs the `uninstall.sh` script, which completely removes the project's binary
 ### Defining Words
 
 **Basic Lookup**
+
 If no input or output options are provided, the tool defaults to English.
 ```bash
 defword define ambiguous
@@ -45,6 +46,7 @@ defword define ambiguous
 > Ambiguous (adjective) - Open to multiple interpretations.
 
 **Translation**
+
 Specify the input and output languages. In this example, the input is German (`de`) and the output is Italian (`it`).
 ```bash
 defword define langsam -i de -o it
@@ -52,6 +54,7 @@ defword define langsam -i de -o it
 > Lento (aggettivo) - Impiega molto tempo per muoversi o percorrere una breve distanza, o per eseguire un'azione; non è veloce nel movimento; procede a bassa velocità.
 
 **Multiple Output Languages**
+
 You can provide multiple output languages:
 ```bash
 defword define strasse -i de -o it -o pl -o es
